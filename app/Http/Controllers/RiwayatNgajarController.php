@@ -12,7 +12,8 @@ class RiwayatNgajarController extends Controller
     public function index()
     {
         $riwayat = RiwayatNgajar::with(['guru','kelas'])->orderBy('id_riwayat','desc')->get();
-        return view('admin.riwayat_pengajar.index', compact('riwayat'));
+        $pageData['riwayat'] = RiwayatNgajar::simplePaginate(2);
+        return view('admin.riwayat_pengajar.index', $pageData);
     }
 
     public function create()

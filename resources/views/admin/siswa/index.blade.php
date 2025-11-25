@@ -46,5 +46,8 @@
             @endforeach
         </tbody>
     </table>
+    <div class="mt-3">
+        {{ $data->links('pagination::simple-bootstrap-5') }}
+    </div>
 </div>
 @endsection

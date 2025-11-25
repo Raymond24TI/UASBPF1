@@ -12,7 +12,8 @@ class AlumniController extends Controller
     public function index()
     {
         $alumni = Alumni::orderBy('id_alumni','desc')->get();
-        return view('admin.alumni.index', compact('alumni'));
+        $pageData['alumni'] = Alumni::simplePaginate(2);
+        return view('admin.alumni.index', $pageData);
     }
 
     public function create()

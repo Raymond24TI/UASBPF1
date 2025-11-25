@@ -12,9 +12,10 @@ class GuruController extends Controller
     {
         // Ambil semua data guru sesuai database kamu
         $data = Guru::orderBy('id_guru', 'desc')->get();
+        $pageData['data'] = Guru::simplePaginate(2);
 
         // Kirim ke view
-        return view('admin.guru.index', compact('data'));
+        return view('admin.guru.index', $pageData);
     }
 
     public function create()

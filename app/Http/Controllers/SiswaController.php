@@ -12,9 +12,9 @@ class SiswaController extends Controller
     {
         // Ambil semua data siswa
         $data = Siswa::orderBy('id_siswa', 'desc')->get();
-
+        $pageData['data'] = Siswa::simplePaginate(2);
         // Kirim ke view
-        return view('admin.siswa.index', compact('data'));
+        return view('admin.siswa.index',  $pageData);
         // atau bisa juga: return view('admin.siswa.index', ['data' => $data]);
     }
 
