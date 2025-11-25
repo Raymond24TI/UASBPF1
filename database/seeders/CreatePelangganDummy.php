@@ -14,7 +14,9 @@ class CreatePelangganDummy extends Seeder
         $faker = Factory::create();
 
         // Ambil semua id kelas yg valid
+
         $kelasIDs = DB::table('guru')->pluck('id_guru')->toArray();
+
 
         foreach (range(1, 100) as $index) {
             DB::table('guru')->insert([

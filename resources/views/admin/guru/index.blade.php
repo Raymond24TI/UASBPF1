@@ -4,10 +4,17 @@
         <h2 class="mb-3">Daftar Guru</h2>
 
         <a href="{{ route('guru.create') }}" class="btn btn-success mb-3">Tambah Guru</a>
+        <form method="GET" action="{{ route('guru.index') }}" class="mb-3 d-flex" style="max-width: 350px;">
+            <input type="text" name="search" class="form-control me-2" placeholder="Cari nama atau email..."
+                value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary">Cari</button>
+        </form>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+
+
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
         <table class="table table-bordered table-striped">
             <thead class="table-primary">
@@ -29,7 +36,7 @@
                         <td>{{ $g->email }}</td>
                         <td>{{ $g->no_telp }}</td>
                         <td>{{ $g->alamat }}</td>
-                        <td>{{ $g->password}}</td>
+                        <td>{{ $g->password }}</td>
 
                         <td>
                             <a href="{{ route('guru.edit', $g->id_guru) }}" class="btn btn-warning btn-sm">

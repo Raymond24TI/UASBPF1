@@ -15,7 +15,22 @@ class GuruController extends Controller
         $pageData['data'] = Guru::simplePaginate(2);
 
         // Kirim ke view
+<<<<<<< HEAD
         return view('admin.guru.index', $pageData);
+=======
+        return view('admin.guru.index', compact('data'));
+
+            $search = $request->search;
+
+    $data = Guru::orderBy('id_guru', 'desc')
+        ->when($search, function ($query, $search) {
+            return $query->where('nama_guru', 'like', "%$search%")
+                         ->orWhere('email', 'like', "%$search%");
+        })
+        ->get();
+
+    return view('admin.guru.index', compact('data', 'search'));
+>>>>>>> 535c2c05d8c90effb928ef1bcf5bda4e4817fc9f
     }
 
     public function create()
