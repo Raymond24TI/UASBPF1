@@ -15,6 +15,17 @@ class GuruController extends Controller
 
         // Kirim ke view
         return view('admin.guru.index', compact('data'));
+
+            $search = $request->search;
+
+    $data = Guru::orderBy('id_guru', 'desc')
+        ->when($search, function ($query, $search) {
+            return $query->where('nama_guru', 'like', "%$search%")
+                         ->orWhere('email', 'like', "%$search%");
+        })
+        ->get();
+
+    return view('admin.guru.index', compact('data', 'search'));
     }
 
     public function create()
