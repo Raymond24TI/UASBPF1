@@ -8,37 +8,38 @@ use Illuminate\Support\Facades\Hash;
 
 class GuruController extends Controller
 {
-    public function index()
+    // ===========================
+    // INDEX + SEARCH + PAGINATION
+    // ===========================
+    public function index(Request $request)
     {
-        // Ambil semua data guru sesuai database kamu
-        $data = Guru::orderBy('id_guru', 'desc')->get();
-        $pageData['data'] = Guru::simplePaginate(2);
+        $search = $request->search;
 
-        // Kirim ke view
-<<<<<<< HEAD
-        return view('admin.guru.index', $pageData);
-=======
-        return view('admin.guru.index', compact('data'));
+        $data = Guru::orderBy('id_guru', 'desc')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_guru', 'like', "%$search%")
+                      ->orWhere('email', 'like', "%$search%");
+                });
+            })
+            ->paginate(10)
+            ->appends(['search' => $search]); // agar pagination tetap bawa search
 
-            $search = $request->search;
-
-    $data = Guru::orderBy('id_guru', 'desc')
-        ->when($search, function ($query, $search) {
-            return $query->where('nama_guru', 'like', "%$search%")
-                         ->orWhere('email', 'like', "%$search%");
-        })
-        ->get();
-
-    return view('admin.guru.index', compact('data', 'search'));
->>>>>>> 535c2c05d8c90effb928ef1bcf5bda4e4817fc9f
+        return view('admin.guru.index', compact('data', 'search'));
     }
 
+    // ===========================
+    // TAMPIL FORM TAMBAH
+    // ===========================
     public function create()
     {
         $kelas = Kelas::all();
         return view('admin.guru.tambah', compact('kelas'));
     }
 
+    // ===========================
+    // PROSES SIMPAN GURU BARU
+    // ===========================
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -52,20 +53,29 @@ class GuruController extends Controller
         ]);
 
         $data['password'] = Hash::make($data['password']);
+
         Guru::create($data);
-        return redirect()->route('guru.index')->with('success', 'Guru ditambahkan');
+
+        return redirect()->route('guru.index')->with('success', 'Guru berhasil ditambahkan.');
     }
 
+    // ===========================
+    // TAMPIL FORM EDIT
+    // ===========================
     public function edit($id)
     {
-        $guru     = Guru::findOrFail($id);
+        $guru  = Guru::findOrFail($id);
         $kelas = Kelas::all();
         return view('admin.guru.edit', compact('guru', 'kelas'));
     }
 
+    // ===========================
+    // PROSES UPDATE DATA
+    // ===========================
     public function update(Request $request, $id)
     {
-        $guru    = Guru::findOrFail($id);
+        $guru = Guru::findOrFail($id);
+
         $data = $request->validate([
             'nama_guru'        => 'required|string',
             'email'            => 'required|email|unique:guru,email,' . $id . ',id_guru',
@@ -76,19 +86,25 @@ class GuruController extends Controller
             'tempat_tgl_lahir' => 'nullable|date',
         ]);
 
-        if (! empty($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
+        // Jika password diisi baru, hash ulang
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
         } else {
-            unset($data['password']);
+            unset($data['password']); // jangan update password jika kosong
         }
 
         $guru->update($data);
-        return redirect()->route('guru.index')->with('success', 'Guru diperbarui');
+
+        return redirect()->route('guru.index')->with('success', 'Data guru berhasil diperbarui.');
     }
 
+    // ===========================
+    // HAPUS DATA GURU
+    // ===========================
     public function destroy($id)
     {
         Guru::findOrFail($id)->delete();
-        return redirect()->route('guru.index')->with('success', 'Guru dihapus');
+
+        return redirect()->route('guru.index')->with('success', 'Data guru berhasil dihapus.');
     }
 }

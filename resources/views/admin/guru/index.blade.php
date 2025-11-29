@@ -36,7 +36,7 @@
                         <td>{{ $g->email }}</td>
                         <td>{{ $g->no_telp }}</td>
                         <td>{{ $g->alamat }}</td>
-                        <td>{{ $g->password }}</td>
+                        <td>{{ Str::limit($g->password, 10, '...')}}</td>
 
                         <td>
                             <a href="{{ route('guru.edit', $g->id_guru) }}" class="btn btn-warning btn-sm">
