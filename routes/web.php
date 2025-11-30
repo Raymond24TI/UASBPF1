@@ -12,6 +12,8 @@ use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\RiwayatNgajarController;
 
 
+Route::get('/', fn() => view('indexhome'))->name('welcome');
+
 // ===============================
 // AUTH (TANPA MIDDLEWARE)
 // ===============================
