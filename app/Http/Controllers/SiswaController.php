@@ -1,23 +1,33 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Siswa;
 use App\Models\Kelas;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
 
 class SiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil semua data siswa
-        $data = Siswa::orderBy('id_siswa', 'desc')->get();
-        $pageData['data'] = Siswa::simplePaginate(2);
-        // Kirim ke view
-        return view('admin.siswa.index',  $pageData);
-        // atau bisa juga: return view('admin.siswa.index', ['data' => $data]);
-    }
+        // Ambil semua kelas untuk dropdown filter
+        $kelas = Kelas::all();
 
+        // Query siswa
+        $query = Siswa::with('kelas')->orderBy('id_siswa', 'desc');
+
+        // Filter jika kelas_id dipilih
+        if ($request->has('kelas_id') && $request->kelas_id != '') {
+            $query->where('id_kelas', $request->kelas_id);
+        }
+
+        // Pagination
+        $data = $query->paginate(5);
+
+        return view('admin.siswa.index', [
+            'data'  => $data,
+            'kelas' => $kelas,
+        ]);
+    }
 
     public function create()
     {
@@ -25,57 +35,60 @@ class SiswaController extends Controller
         return view('admin.siswa.tambah', compact('kelas'));
     }
 
-public function store(Request $request)
-{
-    $data = $request->validate([
-        'nama_siswa'=>'required|string',
-        'id_kelas'=>'required|int|exists:kelas,id_kelas',
-        'alamat'=>'nullable|string',
-        'email'=>'required|email|unique:siswa,email',
-        'no_telp'=>'nullable|string|max:20',
-        'nama_wali'=>'nullable|string',
-        'password'=>'required|min:6',
-        'tempat_tgl_lahir'=>'nullable|date',
-    ]);
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'nama_siswa'       => 'required|string',
+            'id_kelas'         => 'required|int|exists:kelas,id_kelas',
+            'alamat'           => 'nullable|string',
+            'email'            => 'required|email|unique:siswa,email',
+            'no_telp'          => 'nullable|string|max:20',
+            'nama_wali'        => 'nullable|string',
+            'password'         => 'required|min:6',
+            'tempat_tgl_lahir' => 'nullable|date',
+        ]);
 
-    // Encrypt password
-    $data['password'] = bcrypt($data['password']);
+        // Encrypt password
+        $data['password'] = bcrypt($data['password']);
 
-    Siswa::create($data);
+        Siswa::create($data);
 
-    return redirect()->route('siswa.index')->with('success','Siswa berhasil ditambahkan');
-}
-
+        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil ditambahkan');
+    }
 
     public function edit($id)
     {
-        $s = Siswa::findOrFail($id);
+        $s     = Siswa::findOrFail($id);
         $kelas = Kelas::all();
-        return view('admin.siswa.edit', compact('s','kelas'));
+        return view('admin.siswa.edit', compact('s', 'kelas'));
     }
 
     public function update(Request $request, $id)
     {
-        $s = Siswa::findOrFail($id);
+        $s    = Siswa::findOrFail($id);
         $data = $request->validate([
-            'nama_siswa'=>'required|string',
-            'nama_wali'=>'nullable|string',
-            'email'=>'required|email|unique:siswa,email,'.$id.',id_siswa',
-            'no_telp'=>'nullable',
-            'password'=>'nullable|min:6',
-            'id_kelas'=>'nullable|int',
-            'alamat'=>'nullable',
-            'tempat_tgl_lahir'=>'nullable|date'
+            'nama_siswa'       => 'required|string',
+            'nama_wali'        => 'nullable|string',
+            'email'            => 'required|email|unique:siswa,email,' . $id . ',id_siswa',
+            'no_telp'          => 'nullable',
+            'password'         => 'nullable|min:6',
+            'id_kelas'         => 'nullable|int',
+            'alamat'           => 'nullable',
+            'tempat_tgl_lahir' => 'nullable|date',
         ]);
-        if(!empty($data['password'])) $data['password'] = bcrypt($data['password']);
-        else unset($data['password']);
+        if (! empty($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
         $s->update($data);
-        return redirect()->route('siswa.index')->with('success','Siswa diperbarui');
+        return redirect()->route('siswa.index')->with('success', 'Siswa diperbarui');
     }
 
     public function destroy($id)
     {
         Siswa::findOrFail($id)->delete();
-        return redirect()->route('siswa.index')->with('success','Siswa dihapus');
+        return redirect()->route('siswa.index')->with('success', 'Siswa dihapus');
     }
 }

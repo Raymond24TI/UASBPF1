@@ -3,7 +3,23 @@
 <div class="container mt-4">
     <h2>Daftar Siswa</h2>
 
-    <a href="{{ route('siswa.create') }}" class="btn btn-success mb-3">Tambah Siswa</a>
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{{ route('siswa.create') }}" class="btn btn-success">Tambah Siswa</a>
+
+        {{-- FILTER KELAS --}}
+<form action="{{ route('siswa.index') }}" method="GET" class="d-flex">
+    <select name="kelas_id" class="form-select me-2" onchange="this.form.submit()">
+        <option value="">-- Semua Kelas --</option>
+        @foreach ($kelas as $k)
+            <option value="{{ $k->id_kelas }}" {{ request('kelas_id') == $k->id_kelas ? 'selected' : '' }}>
+                {{ $k->nama_kelas }}
+            </option>
+        @endforeach
+    </select>
+    <noscript><button class="btn btn-primary">Filter</button></noscript>
+</form>
+
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -46,8 +62,9 @@
             @endforeach
         </tbody>
     </table>
+
     <div class="mt-3">
-        {{ $data->links('pagination::simple-bootstrap-5') }}
+        {{ $data->appends(['kelas_id' => request('kelas_id')])->links('pagination::simple-bootstrap-5') }}
     </div>
 </div>
 @endsection
