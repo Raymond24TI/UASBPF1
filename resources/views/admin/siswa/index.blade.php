@@ -98,6 +98,14 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                             </form>
+                            <form action="{{ route('siswa.toAlumni', $s->id_siswa) }}"
+      method="POST"
+      style="display:inline-block;"
+      onsubmit="return confirm('Pindahkan siswa ini menjadi alumni?')">
+    @csrf
+    <button type="submit" class="btn btn-info btn-sm">Jadikan Alumni</button>
+</form>
+
                         </td>
                     </tr>
                 @endforeach

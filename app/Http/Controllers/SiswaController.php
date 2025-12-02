@@ -97,4 +97,24 @@ public function index(Request $request)
         Siswa::findOrFail($id)->delete();
         return redirect()->route('siswa.index')->with('success', 'Siswa dihapus');
     }
+    public function toAlumni($id)
+{
+    $s = Siswa::findOrFail($id);
+
+    // Pindahkan ke tabel alumni
+    \DB::table('alumni')->insert([
+        'nama_siswa'          => $s->nama_siswa,
+        'email'         => $s->email,
+        'no_telp'       => $s->no_telp,
+        'alamat'        => $s->alamat,
+        'id_kelas'      => $s->id_kelas,
+        'tahun_lulus' => now()->year,
+    ]);
+
+    // Hapus dari tabel siswa
+    $s->delete();
+
+    return redirect()->back()->with('success', 'Siswa berhasil dipindahkan menjadi alumni.');
+}
+
 }

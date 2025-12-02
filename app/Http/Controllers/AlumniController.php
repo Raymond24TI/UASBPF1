@@ -41,4 +41,34 @@ class AlumniController extends Controller
         Alumni::findOrFail($id)->delete();
         return redirect()->route('alumni.index')->with('success','Alumni dihapus');
     }
+
+    public function edit($id)
+{
+    $alumni = Alumni::findOrFail($id);
+    $kelas = Kelas::all();
+
+    return view('admin.alumni.edit', compact('alumni', 'kelas'));
+}
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'nama_siswa' => 'required',
+        'email' => 'required|email',
+        'id_kelas' => 'required',
+        'alamat' => 'required',
+        'tahun_lulus' => 'required|digits:4',
+    ]);
+
+    Alumni::where('id_alumni', $id)->update([
+        'nama_siswa' => $request->nama_siswa,
+        'email' => $request->email,
+        'id_kelas' => $request->id_kelas,
+        'alamat' => $request->alamat,
+        'tahun_lulus' => $request->tahun_lulus,
+    ]);
+
+    return redirect()->route('alumni.index')->with('success', 'Data alumni berhasil diperbarui.');
+}
+
 }
