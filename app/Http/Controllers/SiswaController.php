@@ -7,27 +7,33 @@ use Illuminate\Http\Request;
 
 class SiswaController extends Controller
 {
-    public function index(Request $request)
-    {
-        // Ambil semua kelas untuk dropdown filter
-        $kelas = Kelas::all();
+public function index(Request $request)
+{
+    $kelas = Kelas::all();
 
-        // Query siswa
-        $query = Siswa::with('kelas')->orderBy('id_siswa', 'desc');
+    $query = Siswa::with('kelas')->orderBy('id_siswa', 'desc');
 
-        // Filter jika kelas_id dipilih
-        if ($request->has('kelas_id') && $request->kelas_id != '') {
-            $query->where('id_kelas', $request->kelas_id);
-        }
-
-        // Pagination
-        $data = $query->paginate(5);
-
-        return view('admin.siswa.index', [
-            'data'  => $data,
-            'kelas' => $kelas,
-        ]);
+    // Filter kelas
+    if ($request->kelas_id != '') {
+        $query->where('id_kelas', $request->kelas_id);
     }
+
+    // Search (berlaku untuk id_siswa, nama, email)
+    if ($request->search != '') {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('id_siswa', 'LIKE', "%$search%")
+              ->orWhere('nama_siswa', 'LIKE', "%$search%")
+              ->orWhere('email', 'LIKE', "%$search%");
+        });
+    }
+
+    // Pagination 5 per page
+    $data = $query->paginate(5);
+
+    return view('admin.siswa.index', compact('data', 'kelas'));
+}
+
 
     public function create()
     {

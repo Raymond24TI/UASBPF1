@@ -2,7 +2,11 @@
 @section('content')
 <div class="container mt-4">
     <h2 class="mb-4 fw-bold">Riwayat Pengajar</h2>
-
+            <form method="GET" action="{{ route('guru.index') }}" class="mb-3 d-flex" style="max-width: 350px;">
+            <input type="text" name="search" class="form-control me-2" placeholder="Cari nama atau email..."
+                value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary">Cari</button>
+        </form>
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
